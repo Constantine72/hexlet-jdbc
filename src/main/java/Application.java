@@ -17,32 +17,19 @@ public class Application {
                 statement.execute(sql);
             }
 
-            var sql2 = "INSERT INTO users (username, phone) VALUES (?, ?)";
-            try (var preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-                preparedStatement.setString(1, "Sarah");
-                preparedStatement.setString(2, "333333333");
+          UserDAO userDAO = new UserDAO(conn);
 
-                preparedStatement.executeUpdate();
+            User Sarah = new User("Sarah", "333333333");
+            userDAO.save(Sarah);
 
-                preparedStatement.setString(1, "John");
-                preparedStatement.setString(2, "77777777");
+            User John = new User("John", "77777777");
+            userDAO.save(John);
 
-                preparedStatement.executeUpdate();
+            userDAO.deleteById(1L);
 
-                var generatedKeys = preparedStatement.getGeneratedKeys();
-                if (generatedKeys.next()) {
-                    System.out.println(generatedKeys.getLong(1));
-                } else {
-                    throw new SQLException("DB have not returned an id after saving the entity");
-                }
-            }
+            var user = userDAO.find(2L);
 
-            var sqlDelete = "DELETE FROM users WHERE name = ?";
-            try (var pstmDelete = conn.prepareStatement(sqlDelete)) {
-                pstmDelete.setString(1, "Sarah");
-                pstmDelete.executeUpdate();
-            }
-
+            conn.close();
 
 
             var sql3 = "SELECT * FROM users";
